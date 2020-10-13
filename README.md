@@ -1,0 +1,1 @@
+This is a simple Spring Boot apps for use in various use cases.
