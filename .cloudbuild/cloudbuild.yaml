@@ -1,0 +1,26 @@
+steps:
+  - name: "gcr.io/${PROJECT_ID}/restore_cache"
+    id: "download_cache"
+    args:
+      - "--bucket=gs://${PROJECT_ID}-cloud-build/cache"
+      - "--key=huddle-up-cache-$(checksum pom.xml)"
+  - name: "gcr.io/cloud-builders/mvn"
+    id: "build"
+    args:
+      - "package"
+      - "-f"
+      - "pom.xml"
+    env:
+      - MAVEN_OPTS=-Dmaven.repo.local=/workspace/.cache/.m2
+  - name: "gcr.io/${PROJECT_ID}/save_cache"
+    id: "upload_cache"
+    args:
+      - "--bucket=gs://${PROJECT_ID}-cloud-build/cache"
+      - "--key=huddle-up-cache-$(checksum pom.xml)"
+      - "--path=/workspace/.cache/.m2"
+      - "--no-clobber"
+
+artifacts:
+  objects:
+    location: "gs://${PROJECT_ID}-cloud-build/artifacts"
+    paths: [ "target/*.jar" ]
