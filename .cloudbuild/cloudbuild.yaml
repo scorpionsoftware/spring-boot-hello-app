@@ -3,7 +3,7 @@ steps:
     id: "download_cache"
     args:
       - "--bucket=gs://${PROJECT_ID}-cloud-build/cache"
-      - "--key=huddle-up-cache-$(checksum pom.xml)"
+      - "--key=hello-app-cache-$(checksum pom.xml)"
   - name: "gcr.io/cloud-builders/mvn"
     id: "build"
     args:
@@ -16,7 +16,7 @@ steps:
     id: "upload_cache"
     args:
       - "--bucket=gs://${PROJECT_ID}-cloud-build/cache"
-      - "--key=huddle-up-cache-$(checksum pom.xml)"
+      - "--key=hello-app-cache-$(checksum pom.xml)"
       - "--path=/workspace/.cache/.m2"
       - "--no-clobber"
 
