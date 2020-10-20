@@ -1,0 +1,39 @@
+steps:
+  - name: "gcr.io/cloud-builders/gsutil"
+    id: "download_cache"
+    args:
+      - "-m"
+      - "rsync"
+      - "-r"
+      - "gs://${PROJECT_ID}-cloud-build/cache/.m2/"
+      - "/cache/.m2"
+    volumes:
+      - path: "/cache/.m2"
+        name: "m2_cache"
+  - name: "gcr.io/cloud-builders/mvn"
+    id: "build"
+    args:
+      - "package"
+      - "-f"
+      - "pom.xml"
+    volumes:
+      - path: "/cache/.m2"
+        name: "m2_cache"
+    env:
+      - MAVEN_OPTS=-Dmaven.repo.local=/cache/.m2
+  - name: "gcr.io/cloud-builders/gsutil"
+    id: "upload_cache"
+    args:
+      - "-m"
+      - "rsync"
+      - "-r"
+      - "/cache/.m2"
+      - "gs://${PROJECT_ID}-cloud-build/cache/.m2/"
+    volumes:
+      - path: "/cache/.m2"
+        name: "m2_cache"
+
+artifacts:
+  objects:
+    location: "gs://${PROJECT_ID}-cloud-build/artifacts"
+    paths: [ "target/*.jar" ]
